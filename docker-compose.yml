@@ -1,0 +1,390 @@
+
+services:
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_prowlarr:/config
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_jackett:/config
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  #################
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_sonarr:/config
+      - /data/media:/data
+      - /data/downloads/qbittorrent:/downloads
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_radarr:/config
+      - /data/media:/data
+      - /data/downloads/qbittorrent:/downloads
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_lidarr:/config
+      - /data/media:/data
+      - /data/downloads/qbittorrent:/downloads
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  # readarr:
+  #   image: lscr.io/linuxserver/readarr:develop
+  #   container_name: readarr
+  #   network_mode: "service:gluetun"
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=America/Los_Angeles
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - config_readarr:/config
+  #     - /data/media:/data
+  #     - /data/downloads/qbittorrent:/downloads
+  #   depends_on:
+  #     gluetun:
+  #       condition: service_healthy
+  #       restart: true
+  #   restart: unless-stopped
+
+  whisparr:
+    image: ghcr.io/hotio/whisparr
+    container_name: whisparr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_whisparr:/config
+      - /data/media:/data
+      - /data/downloads/qbittorrent:/downloads
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  #################
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_bazarr:/config
+      - /data/media:/data
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  trailarr:
+    image: nandyalu/trailarr
+    container_name: trailarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_trailarr:/config
+      - /data/media:/data
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  #################
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - config_qbittorrent:/config
+      - /data/downloads/qbittorrent:/downloads
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+    labels:
+      - deunhealth.restart.on.unhealthy=true
+    healthcheck:
+      test: ping -c 1 www.google.com || exit 1
+      interval: 60s
+      retries: 3
+      start_period: 20s
+      timeout: 10s
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_sabnzbd:/config
+      - /data/downloads/sabnzbd:/config/Downloads
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  nzbget:
+    image: lscr.io/linuxserver/nzbget:latest
+    container_name: nzbget
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_nzbget:/config
+      - /data/downloads/nzbget:/downloads
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
+
+  deunhealth:
+    image: qmcgaw/deunhealth
+    container_name: deunhealth
+    network_mode: "none"
+    environment:
+      - LOG_LEVEL=info
+      - HEALTH_SERVER_ADDRESS=127.0.0.1:9999
+      - TZ=America/Los_Angeles
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  #################
+
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      TZ: America/Los_Angeles
+      FIREWALL_OUTBOUND_SUBNETS: 192.168.2.0/24
+
+      VPN_SERVICE_PROVIDER: mullvad
+      VPN_TYPE: wireguard
+      WIREGUARD_PRIVATE_KEY: ${WIREGUARD_PRIVATE_KEY}
+      WIREGUARD_ADDRESSES: ${WIREGUARD_ADDRESSES}
+      SERVER_CITIES: ${SERVER_CITIES}
+    env_file:
+      - .env
+    ports:
+      - "9696:9696"   # Prowlarr
+      - "9117:9117"   # Jackett
+
+      - "8989:8989"   # Sonarr
+      - "7878:7878"   # Radarr
+      - "8686:8686"   # Lidarr
+      - "8787:8787"   # Readarr
+      - "6969:6969"   # Whisparr
+
+      - "6767:6767"   # Bazarr
+      - "7889:7889"   # trailarr
+
+      - "8080:8080"   # qBittorrent web interface
+      - "6881:6881"   # qBittorrent torrent port
+      - "8085:8085"   # SABnzbd
+      - "6789:6789"   # nzbget
+    volumes:
+      - config_gluetun:/gluetun
+    networks:
+      - arrnet
+    healthcheck:
+      test: ping -c 1 www.google.com || exit 1
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  #################
+
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    container_name: tdarr
+    networks:
+      - arrnet
+    ports:
+      - "8265:8265"
+      - "8266:8266"
+    environment:
+      - TZ=America/Los_Angeles
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_tdarr:/config
+      - /data/media:/data
+    restart: unless-stopped
+
+  #################
+
+  huntarr:
+    image: huntarr/huntarr:latest
+    container_name: huntarr
+    networks:
+      - arrnet
+    ports:
+      - "9705:9705"
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - config_huntarr:/config
+      - /data/media:/data
+    restart: unless-stopped
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr
+    container_name: jellyseerr
+    networks:
+      - arrnet
+    ports:
+      - "5055:5055"
+    environment:
+      - TZ=America/Los_Angeles
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - config_jellyseerr:/app/config
+    restart: unless-stopped
+
+  #################
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    networks:
+      - arrnet
+    ports:
+      - "8096:8096"
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - config_jellyfin:/config
+      - /data/media:/data
+    restart: unless-stopped
+
+#################
+
+networks:
+  arrnet:
+    driver: bridge
+
+volumes:
+  config_prowlarr:
+  config_jackett:
+  config_sonarr:
+  config_radarr:
+  config_lidarr:
+  config_readarr:
+  config_whisparr:
+  config_bazarr:
+  config_trailarr:
+  config_qbittorrent:
+  config_sabnzbd:
+  config_nzbget:
+  config_gluetun:
+  config_tdarr:
+  config_huntarr:
+  config_jellyseerr:
+  config_jellyfin:
