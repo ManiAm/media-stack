@@ -50,6 +50,7 @@ services:
       - config_sonarr:/config
       - /data/media:/data
       - /data/downloads/qbittorrent:/downloads
+      - /data/downloads/sabnzbd:/config/Downloads
     depends_on:
       gluetun:
         condition: service_healthy
@@ -69,6 +70,7 @@ services:
       - config_radarr:/config
       - /data/media:/data
       - /data/downloads/qbittorrent:/downloads
+      - /data/downloads/sabnzbd:/config/Downloads
     depends_on:
       gluetun:
         condition: service_healthy
@@ -88,6 +90,7 @@ services:
       - config_lidarr:/config
       - /data/media:/data
       - /data/downloads/qbittorrent:/downloads
+      - /data/downloads/sabnzbd:/config/Downloads
     depends_on:
       gluetun:
         condition: service_healthy
@@ -107,6 +110,7 @@ services:
   #     - config_readarr:/config
   #     - /data/media:/data
   #     - /data/downloads/qbittorrent:/downloads
+  #     - /data/downloads/sabnzbd:/config/Downloads
   #   depends_on:
   #     gluetun:
   #       condition: service_healthy
@@ -126,6 +130,7 @@ services:
       - config_whisparr:/config
       - /data/media:/data
       - /data/downloads/qbittorrent:/downloads
+      - /data/downloads/sabnzbd:/config/Downloads
     depends_on:
       gluetun:
         condition: service_healthy
@@ -284,6 +289,8 @@ services:
       - "6881:6881"   # qBittorrent torrent port
       - "8085:8085"   # SABnzbd
       - "6789:6789"   # nzbget
+
+      - "5055:5055"   # jellyseerr
     volumes:
       - config_gluetun:/gluetun
     networks:
@@ -335,10 +342,7 @@ services:
   jellyseerr:
     image: fallenbagel/jellyseerr
     container_name: jellyseerr
-    networks:
-      - arrnet
-    ports:
-      - "5055:5055"
+    network_mode: "service:gluetun"
     environment:
       - TZ=America/Los_Angeles
       - PUID=1000
